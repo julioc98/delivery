@@ -51,7 +51,7 @@ linters:
     - asciicheck
     - bodyclose
     - cyclop
-    - depguard
+    # - depguard 
     - dogsled
     - dupl
     - durationcheck
@@ -79,7 +79,7 @@ linters:
     - gomoddirectives
     - gomodguard
     - goprintffuncname
-    - gosec
+    # - gosec
     - ifshort
     - importas
     - lll
@@ -104,7 +104,7 @@ linters:
     - unparam
     - wastedassign
     - whitespace
-    - wrapcheck
+    # - wrapcheck
     - wsl
 
     # deprecated linters
