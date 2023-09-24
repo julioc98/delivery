@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/julioc98/delivery/internal/app"
 	"github.com/julioc98/delivery/internal/infra/api"
 	"github.com/julioc98/delivery/internal/infra/db"
@@ -16,6 +17,10 @@ import (
 
 func main() {
 	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Heartbeat("/"))
+	r.Use(middleware.AllowContentType("application/json", "text/xml"))
 
 	// Create dependencies.
 	conn, err := dbConn()

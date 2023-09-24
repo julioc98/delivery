@@ -1,11 +1,16 @@
 package api
 
-import "github.com/go-chi/chi/v5"
+import (
+	"github.com/go-chi/chi/v5"
+	"github.com/julioc98/delivery/internal/domain"
+)
 
 // DeliveryUseCase represents a use case for delivery drivers.
 type DeliveryUseCase interface {
 	// Save saves a driver position.
 	SaveDriverPosition(driverID uint64, latitude, longitude float64) error
+	// FindDriverPosition finds a driver position.
+	FindDriverPosition(driverID uint64) (domain.DriverPosition, error)
 }
 
 // DeliveryRestHandler represents a REST handler for delivery drivers.
@@ -25,4 +30,5 @@ func NewDeliveryRestHandler(r *chi.Mux, uc DeliveryUseCase) *DeliveryRestHandler
 // RegisterHandlers registers the handlers of the REST API.
 func (h *DeliveryRestHandler) RegisterHandlers() {
 	h.r.Post("/drivers/{driverID}/locations", h.SavePosition)
+	h.r.Get("/drivers/{driverID}/locations/current", h.FindPosition)
 }

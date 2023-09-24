@@ -4,6 +4,8 @@ package db
 import (
 	"database/sql"
 	"fmt"
+
+	"github.com/julioc98/delivery/internal/domain"
 )
 
 // DeliveryPostGISRepository represents a repository for delivery drivers.
@@ -23,4 +25,18 @@ func (repo *DeliveryPostGISRepository) SaveDriverPosition(driverID uint64, latit
 	_, err := repo.db.Exec(query, driverID, coordinates)
 
 	return err
+}
+
+// FindDriverPosition finds a driver position.
+func (repo *DeliveryPostGISRepository) FindDriverPosition(driverID uint64) (domain.DriverPosition, error) {
+	query := `SELECT id, driver_id, ST_X(location::geometry), ST_Y(location::geometry), timestamp 
+		FROM driver_positions WHERE driver_id = $1 ORDER BY timestamp DESC LIMIT 1`
+	row := repo.db.QueryRow(query, driverID)
+
+	var dp domain.DriverPosition
+	if err := row.Scan(&dp.ID, &dp.DriverID, &dp.Location.Long, &dp.Location.Lat, &dp.Timestamp); err != nil {
+		return domain.DriverPosition{}, err
+	}
+
+	return dp, nil
 }
