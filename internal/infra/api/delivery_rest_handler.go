@@ -68,3 +68,33 @@ func (h *DeliveryRestHandler) FindPosition(w http.ResponseWriter, r *http.Reques
 
 	w.WriteHeader(http.StatusOK)
 }
+
+// HistoryPosition finds a driver position history.
+func (h *DeliveryRestHandler) HistoryPosition(w http.ResponseWriter, r *http.Request) {
+	driverID := chi.URLParam(r, "driverID")
+
+	driverIDUint64, err := strconv.ParseUint(driverID, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid driverID", http.StatusBadRequest)
+
+		return
+	}
+
+	positions, err := h.uc.HistoryDriverPosition(driverIDUint64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	encoder := json.NewEncoder(w)
+	if err := encoder.Encode(positions); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

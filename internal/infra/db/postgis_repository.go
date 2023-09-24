@@ -40,3 +40,33 @@ func (repo *DeliveryPostGISRepository) FindDriverPosition(driverID uint64) (doma
 
 	return dp, nil
 }
+
+// HistoryDriverPosition finds a driver position history.
+func (repo *DeliveryPostGISRepository) HistoryDriverPosition(driverID uint64) ([]domain.DriverPosition, error) {
+	query := `SELECT id, driver_id, ST_X(location::geometry), ST_Y(location::geometry), timestamp 
+		FROM driver_positions WHERE driver_id = $1 ORDER BY timestamp DESC`
+
+	rows, err := repo.db.Query(query, driverID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() { _ = rows.Close() }()
+
+	var dps []domain.DriverPosition
+
+	for rows.Next() {
+		var dp domain.DriverPosition
+		if err := rows.Scan(&dp.ID, &dp.DriverID, &dp.Location.Long, &dp.Location.Lat, &dp.Timestamp); err != nil {
+			return nil, err
+		}
+
+		dps = append(dps, dp)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return dps, nil
+}
