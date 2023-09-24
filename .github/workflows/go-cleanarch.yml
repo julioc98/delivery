@@ -18,7 +18,7 @@ jobs:
         with:
           go-version: '^1.16.5' 
       - name: Install go-cleanarch
-        run: go get -v -u github.com/roblaszczak/go-cleanarch
+        run: go install github.com/roblaszczak/go-cleanarch@latest
       - name: Clean Architecture checker for Golang
         run: go-cleanarch
 
