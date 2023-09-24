@@ -13,6 +13,8 @@ type DeliveryUseCase interface {
 	FindDriverPosition(driverID uint64) (domain.DriverPosition, error)
 	// HistoryDriverPosition finds a driver position history.
 	HistoryDriverPosition(driverID uint64) ([]domain.DriverPosition, error)
+	// GetDriversNearby finds drivers nearby.
+	GetDriversNearby(latitude, longitude float64, radius int) ([]domain.DriverPosition, error)
 }
 
 // DeliveryRestHandler represents a REST handler for delivery drivers.
@@ -34,4 +36,5 @@ func (h *DeliveryRestHandler) RegisterHandlers() {
 	h.r.Post("/drivers/{driverID}/locations", h.SavePosition)
 	h.r.Get("/drivers/{driverID}/locations/current", h.FindPosition)
 	h.r.Get("/drivers/{driverID}/locations", h.HistoryPosition)
+	h.r.Get("/drivers/locations/nearby", h.FindNearby)
 }

@@ -70,3 +70,48 @@ func (repo *DeliveryPostGISRepository) HistoryDriverPosition(driverID uint64) ([
 
 	return dps, nil
 }
+
+// GetDriversNearby finds drivers nearby.
+func (repo *DeliveryPostGISRepository) GetDriversNearby(latitude, longitude float64, radius int) ([]domain.DriverPosition, error) {
+	query := `
+		WITH latest_driver_positions AS (
+			SELECT driver_id, MAX(timestamp) AS max_timestamp
+			FROM driver_positions
+			GROUP BY driver_id
+		)
+		
+		SELECT dp.id, dp.driver_id, ST_X(dp.location::geometry), ST_Y(dp.location::geometry), ldp.max_timestamp as timestamp
+		FROM driver_positions dp
+		JOIN latest_driver_positions ldp
+		ON dp.driver_id = ldp.driver_id AND dp.timestamp = ldp.max_timestamp
+		WHERE ST_DWithin(
+			dp.location::geography,
+			ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
+			$3
+		);
+	`
+
+	rows, err := repo.db.Query(query, longitude, latitude, radius)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() { _ = rows.Close() }()
+
+	var dps []domain.DriverPosition
+
+	for rows.Next() {
+		var dp domain.DriverPosition
+		if err := rows.Scan(&dp.ID, &dp.DriverID, &dp.Location.Long, &dp.Location.Lat, &dp.Timestamp); err != nil {
+			return nil, err
+		}
+
+		dps = append(dps, dp)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return dps, nil
+}

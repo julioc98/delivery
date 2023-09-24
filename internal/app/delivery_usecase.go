@@ -11,6 +11,8 @@ type DeliveryRepository interface {
 	FindDriverPosition(driverID uint64) (domain.DriverPosition, error)
 	// HistoryDriverPosition finds a driver position history.
 	HistoryDriverPosition(driverID uint64) ([]domain.DriverPosition, error)
+	// GetDriversNearby finds drivers nearby.
+	GetDriversNearby(latitude, longitude float64, radius int) ([]domain.DriverPosition, error)
 }
 
 // DeliveryUseCase represents a use case for delivery drivers.
@@ -36,4 +38,9 @@ func (uc *DeliveryUseCase) FindDriverPosition(driverID uint64) (domain.DriverPos
 // HistoryDriverPosition finds a driver position history.
 func (uc *DeliveryUseCase) HistoryDriverPosition(driverID uint64) ([]domain.DriverPosition, error) {
 	return uc.repo.HistoryDriverPosition(driverID)
+}
+
+// GetDriversNearby finds drivers nearby.
+func (uc *DeliveryUseCase) GetDriversNearby(latitude, longitude float64, radius int) ([]domain.DriverPosition, error) {
+	return uc.repo.GetDriversNearby(latitude, longitude, radius)
 }
