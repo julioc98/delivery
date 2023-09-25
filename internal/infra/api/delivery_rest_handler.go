@@ -32,7 +32,7 @@ func (h *DeliveryRestHandler) SavePosition(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := h.uc.SaveDriverPosition(driverIDUint64, position.Lat, position.Long); err != nil {
+	if err := h.cmd.SaveDriverPosition(driverIDUint64, position.Lat, position.Long); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -52,7 +52,7 @@ func (h *DeliveryRestHandler) FindPosition(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	position, err := h.uc.FindDriverPosition(driverIDUint64)
+	position, err := h.qry.FindDriverPosition(driverIDUint64)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, "Driver not found", http.StatusNotFound)
@@ -88,7 +88,7 @@ func (h *DeliveryRestHandler) HistoryPosition(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	positions, err := h.uc.HistoryDriverPosition(driverIDUint64)
+	positions, err := h.qry.HistoryDriverPosition(driverIDUint64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 
@@ -142,7 +142,7 @@ func (h *DeliveryRestHandler) FindNearby(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	positions, err := h.uc.GetDriversNearby(latitude, longitude, radius)
+	positions, err := h.qry.GetDriversNearby(latitude, longitude, radius)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 

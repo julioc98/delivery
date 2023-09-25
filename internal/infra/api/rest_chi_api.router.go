@@ -5,10 +5,14 @@ import (
 	"github.com/julioc98/delivery/internal/domain"
 )
 
-// DeliveryUseCase represents a use case for delivery drivers.
-type DeliveryUseCase interface {
+// DeliveryCmd represents a command(CQRS) for delivery drivers.
+type DeliveryCmd interface {
 	// Save saves a driver position.
 	SaveDriverPosition(driverID uint64, latitude, longitude float64) error
+}
+
+// DeliveryQry represents a query(CQRS) for delivery drivers.
+type DeliveryQry interface {
 	// FindDriverPosition finds a driver position.
 	FindDriverPosition(driverID uint64) (domain.DriverPosition, error)
 	// HistoryDriverPosition finds a driver position history.
@@ -17,17 +21,34 @@ type DeliveryUseCase interface {
 	GetDriversNearby(latitude, longitude float64, radius int) ([]domain.DriverPosition, error)
 }
 
+// DeliveryUseCase represents a use case for delivery drivers.
+type DeliveryUseCase interface {
+	DeliveryCmd
+	DeliveryQry
+}
+
 // DeliveryRestHandler represents a REST handler for delivery drivers.
 type DeliveryRestHandler struct {
-	r  *chi.Mux
-	uc DeliveryUseCase
+	r   *chi.Mux
+	cmd DeliveryCmd
+	qry DeliveryQry
 }
 
 // NewDeliveryRestHandler creates a new DeliveryRestHandler.
 func NewDeliveryRestHandler(r *chi.Mux, uc DeliveryUseCase) *DeliveryRestHandler {
 	return &DeliveryRestHandler{
-		r:  r,
-		uc: uc,
+		r:   r,
+		cmd: uc,
+		qry: uc,
+	}
+}
+
+// NewDeliveryRestHandlerByCmdAndQry createsn a new DeliveryRestHandler.
+func NewDeliveryRestHandlerByCmdAndQry(r *chi.Mux, cmd DeliveryCmd, qry DeliveryQry) *DeliveryRestHandler {
+	return &DeliveryRestHandler{
+		r:   r,
+		cmd: cmd,
+		qry: qry,
 	}
 }
 
