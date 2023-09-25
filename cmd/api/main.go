@@ -11,6 +11,7 @@ import (
 	"github.com/julioc98/delivery/internal/app"
 	"github.com/julioc98/delivery/internal/infra/api"
 	"github.com/julioc98/delivery/internal/infra/db"
+	"github.com/redis/go-redis/v9"
 
 	_ "github.com/lib/pq"
 )
@@ -28,7 +29,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	deliveryRepository := db.NewDeliveryPostGISRepository(conn)
+	postGisRepo := db.NewDeliveryPostGISRepository(conn)
+
+	redisClient, err := redisConn()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	deliveryRepository := db.NewRedisRepositoryDecorator(redisClient, postGisRepo)
+
 	deliveryUseCase := app.NewDeliveryUseCase(deliveryRepository)
 
 	// Create handlers.
@@ -55,4 +64,15 @@ func dbConn() (*sql.DB, error) {
 	}
 
 	return conn, nil
+}
+
+func redisConn() (*redis.Client, error) {
+	opt, err := redis.ParseURL("redis://@localhost:6379/0")
+	if err != nil {
+		return nil, err
+	}
+
+	client := redis.NewClient(opt)
+
+	return client, nil
 }
