@@ -8,7 +8,7 @@ type DriverPosition struct {
 	ID        int64     `json:"id,omitempty"`
 	DriverID  uint64    `json:"driverId"`
 	Location  Point     `json:"location"`
-	Timestamp time.Time `json:"timestamp"`
+	Timestamp time.Time `json:"timestamp,omitempty"`
 }
 
 // Point represents a geographic point with latitude and longitude coordinates.

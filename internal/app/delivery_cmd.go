@@ -2,7 +2,9 @@
 package app
 
 import (
-	"fmt"
+	"encoding/json"
+
+	"github.com/julioc98/delivery/internal/domain"
 )
 
 // CreateDriverPositionSubject represents a create driver position subject.
@@ -20,10 +22,17 @@ func NewDeliveryCmd(publisher Publisher) *DeliveryCmd {
 
 // SaveDriverPosition saves a driver position.
 func (p *DeliveryCmd) SaveDriverPosition(driverID uint64, latitude, longitude float64) error {
-	err := p.publisher.Publish(CreateDriverPositionSubject, []byte(
-		fmt.Sprintf(
-			`{ "driverId":%d, "latitude":%f,"longitude":%f }`,
-			driverID, latitude, longitude)))
+	driverPosition := domain.DriverPosition{
+		DriverID: driverID,
+		Location: domain.Point{Lat: latitude, Long: longitude},
+	}
+
+	msg, err := json.Marshal(driverPosition)
+	if err != nil {
+		return err
+	}
+
+	err = p.publisher.Publish(CreateDriverPositionSubject, msg)
 	if err != nil {
 		return err
 	}
