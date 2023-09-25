@@ -136,7 +136,6 @@ func (h *DeliveryRestHandler) FindNearby(w http.ResponseWriter, r *http.Request)
 	}
 
 	radius, err := strconv.Atoi(radiusParam)
-
 	if err != nil {
 		http.Error(w, "Invalid radius", http.StatusBadRequest)
 

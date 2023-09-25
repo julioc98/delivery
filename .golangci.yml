@@ -36,16 +36,13 @@ linters:
   fast: false
   enable:
     # List of enabled-by-default linters that we explicitly opt-in.
-    - deadcode
     - errcheck
     - gosimple
     - govet
     - ineffassign
     - staticcheck
-    - structcheck
     - typecheck
     - unused
-    - varcheck
 
     # List of disabled-by-default linters that we explicitly opt-in.
     - asciicheck
@@ -80,7 +77,6 @@ linters:
     - gomodguard
     - goprintffuncname
     # - gosec
-    - ifshort
     - importas
     - lll
     - makezero
@@ -112,6 +108,10 @@ linters:
     # - interfacer
     # - maligned Replaced by govet 'fieldalignment'
     # - scopelint Replaced by exportloopref
+    # - ifshort 
+    # - structcheck Replaced by unused.
+    # - deadcode Replaced by unused.
+    # - varcheck Replaced by unused.
 
 issues:
   # Independently from option `exclude` we use default exclude patterns,
