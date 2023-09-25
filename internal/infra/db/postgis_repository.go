@@ -19,12 +19,18 @@ func NewDeliveryPostGISRepository(db *sql.DB) *DeliveryPostGISRepository {
 }
 
 // SaveDriverPosition saves a driver position.
-func (repo *DeliveryPostGISRepository) SaveDriverPosition(driverID uint64, latitude, longitude float64) error {
-	query := "INSERT INTO driver_positions (driver_id, location) VALUES ($1, ST_GeomFromText($2, 4326))"
+func (repo *DeliveryPostGISRepository) SaveDriverPosition(driverID uint64, latitude, longitude float64) (int64, error) {
+	query := "INSERT INTO driver_positions (driver_id, location) VALUES ($1, ST_GeomFromText($2, 4326)) RETURNING id"
 	coordinates := fmt.Sprintf("POINT(%f %f)", longitude, latitude)
-	_, err := repo.db.Exec(query, driverID, coordinates)
 
-	return err
+	var insertedID int64
+
+	err := repo.db.QueryRow(query, driverID, coordinates).Scan(&insertedID)
+	if err != nil {
+		return 0, err
+	}
+
+	return insertedID, nil
 }
 
 // FindDriverPosition finds a driver position.

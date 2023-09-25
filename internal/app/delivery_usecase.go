@@ -1,33 +1,40 @@
 // Package app implements the application layer.
 package app
 
-import "github.com/julioc98/delivery/internal/domain"
+import (
+	"fmt"
+	"log"
 
-// DeliveryRepository represents a repository for delivery drivers.
-type DeliveryRepository interface {
-	// SaveDriverPosition saves a driver position.
-	SaveDriverPosition(driverID uint64, latitude, longitude float64) error
-	// FindDriverPosition finds a driver position.
-	FindDriverPosition(driverID uint64) (domain.DriverPosition, error)
-	// HistoryDriverPosition finds a driver position history.
-	HistoryDriverPosition(driverID uint64) ([]domain.DriverPosition, error)
-	// GetDriversNearby finds drivers nearby.
-	GetDriversNearby(latitude, longitude float64, radius int) ([]domain.DriverPosition, error)
-}
+	"github.com/julioc98/delivery/internal/domain"
+)
+
+// NewPositionSubject represents a new position subject.
+const NewPositionSubject = "new.position"
 
 // DeliveryUseCase represents a use case for delivery drivers.
 type DeliveryUseCase struct {
-	repo DeliveryRepository
+	repo  DeliveryRepository
+	event Publisher
 }
 
 // NewDeliveryUseCase creates a new DeliveryUseCase.
-func NewDeliveryUseCase(repo DeliveryRepository) *DeliveryUseCase {
-	return &DeliveryUseCase{repo: repo}
+func NewDeliveryUseCase(repo DeliveryRepository, event Publisher) *DeliveryUseCase {
+	return &DeliveryUseCase{repo: repo, event: event}
 }
 
 // SaveDriverPosition saves a driver position.
 func (uc *DeliveryUseCase) SaveDriverPosition(driverID uint64, latitude, longitude float64) error {
-	return uc.repo.SaveDriverPosition(driverID, latitude, longitude)
+	id, err := uc.repo.SaveDriverPosition(driverID, latitude, longitude)
+	if err != nil {
+		return err
+	}
+
+	err = uc.event.Publish(NewPositionSubject, []byte(fmt.Sprintf(`{"id":%d}`, id)))
+	if err != nil {
+		log.Println("publish err:", err, "id:", id)
+	}
+
+	return nil
 }
 
 // FindDriverPosition finds a driver position.

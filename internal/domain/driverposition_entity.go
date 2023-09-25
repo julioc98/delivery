@@ -5,7 +5,7 @@ import "time"
 
 // DriverPosition represents a delivery driver entity.
 type DriverPosition struct {
-	ID        uint64    `json:"id,omitempty"`
+	ID        int64     `json:"id,omitempty"`
 	DriverID  uint64    `json:"driverId"`
 	Location  Point     `json:"location"`
 	Timestamp time.Time `json:"timestamp"`

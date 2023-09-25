@@ -29,15 +29,15 @@ func NewRedisRepositoryDecorator(redisClient *redis.Client, dbRepo app.DeliveryR
 }
 
 // SaveDriverPosition saves a driver position.
-func (repo *RedisRepositoryDecorator) SaveDriverPosition(driverID uint64, latitude, longitude float64) error {
-	err := repo.dbRepo.SaveDriverPosition(driverID, latitude, longitude)
+func (repo *RedisRepositoryDecorator) SaveDriverPosition(driverID uint64, latitude, longitude float64) (int64, error) {
+	id, err := repo.dbRepo.SaveDriverPosition(driverID, latitude, longitude)
 	if err != nil {
-		return err
+		return id, err
 	}
 
 	_ = repo.ClearCache()
 
-	return nil
+	return id, nil
 }
 
 // FindDriverPosition retrieves a driver's position from either the Redis cache or the database.
