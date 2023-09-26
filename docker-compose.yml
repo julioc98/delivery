@@ -41,7 +41,48 @@ services:
     ports:
       - "4222:4222"
       - "8222:8222"
-  
+
+  monolithic:
+    build:
+      context: .
+      dockerfile: Dockerfile.monolithic
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+      - nats
+
+  query:
+    build:
+      context: .
+      dockerfile: Dockerfile.query
+    ports:
+      - "50051:50051"
+    depends_on:
+      - postgres
+      - redis
+      - nats
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    depends_on:
+      - postgres
+      - redis
+      - nats
+
+  bff:
+    build:
+      context: .
+      dockerfile: Dockerfile.bff
+    ports:
+      - "3001:3001"
+    depends_on:
+      - nats
+      - query
+
 
 volumes:
   postgres_data:

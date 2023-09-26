@@ -9,8 +9,10 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/julioc98/delivery/internal/app"
 	"github.com/julioc98/delivery/internal/infra/api"
+	"github.com/julioc98/delivery/internal/infra/gateway"
 	"github.com/julioc98/delivery/pkg/event"
-	"github.com/nats-io/nats.go"
+	"github.com/julioc98/delivery/pkg/pb"
+	"github.com/julioc98/delivery/pkg/rpc"
 
 	_ "github.com/lib/pq"
 )
@@ -23,7 +25,12 @@ func main() {
 	r.Use(middleware.AllowContentType("application/json", "text/xml"))
 
 	// Create connections.
-	natsClient, err := natsConn()
+	natsClient, err := event.NatsConn()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	gConn, err := rpc.GrpcConn()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,7 +41,12 @@ func main() {
 	// Create dependencies.
 
 	deliverCmd := app.NewDeliveryCmd(natsProducer)
-	deliverQry := app.NewDeliveryQry(natsProducer)
+
+	c := pb.NewQueryServiceClient(gConn)
+
+	gtGrpc := gateway.NewGrpcGateway(c)
+
+	deliverQry := app.NewDeliveryQry(gtGrpc)
 
 	// Create handlers.
 	deliveryRestHandler := api.NewDeliveryRestHandlerByCmdAndQry(r, deliverCmd, deliverQry)
@@ -43,20 +55,10 @@ func main() {
 	http.Handle("/", r)
 
 	// Start server.
-	log.Println("Starting server on port 3000...")
+	log.Println("Starting server on port 3001...")
 
-	err = http.ListenAndServe(":3000", nil)
+	err = http.ListenAndServe(":3001", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func natsConn() (*nats.Conn, error) {
-	// Connect to a server
-	nc, err := nats.Connect(nats.DefaultURL)
-	if err != nil {
-		return nil, err
-	}
-
-	return nc, nil
 }

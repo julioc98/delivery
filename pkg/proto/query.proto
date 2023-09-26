@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package query;
+
+
+option go_package = "github.com/julioc98/delivery/pkg/pb";
+
+
+message DriverPosition {
+  uint64 driver_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  int64 id = 4;
+  google.protobuf.Timestamp timestamp = 5;
+}
+
+
+// Request message to find a driver's position.
+message FindDriverPositionRequest {
+  uint64 driver_id = 1;
+}
+
+// Response message to find a driver's position.
+message FindDriverPositionResponse {
+  DriverPosition position = 1;
+}
+
+// Request message to find a driver's position history.
+message HistoryDriverPositionRequest {
+  uint64 driver_id = 1;
+}
+
+// Response message to find a driver's position history.
+message HistoryDriverPositionResponse {
+  repeated DriverPosition positions = 1;
+}
+
+// Request message to find nearby drivers.
+message FindDriversNearbyRequest {
+  double latitude = 1;
+  double longitude = 2;
+  int32 radius = 3;
+}
+
+// Response message to find nearby drivers.
+message FindDriversNearbyResponse {
+  repeated DriverPosition positions = 1;
+}
+
+// Definition of the query service.
+service QueryService {
+  // Find a driver's current position.
+  rpc FindDriverPosition(FindDriverPositionRequest) returns (FindDriverPositionResponse);
+
+  // Find a driver's position history.
+  rpc HistoryDriverPosition(HistoryDriverPositionRequest) returns (HistoryDriverPositionResponse);
+
+  // Find drivers nearby a given location.
+  rpc FindDriversNearby(FindDriversNearbyRequest) returns (FindDriversNearbyResponse);
+}

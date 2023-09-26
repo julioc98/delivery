@@ -1,4 +1,3 @@
-// Package mdg represents the message driven gateway.
 package app
 
 import (
@@ -7,26 +6,25 @@ import (
 
 // DeliveryQry represents a NATS message producer.
 type DeliveryQry struct {
-	publisher Publisher
+	repo DeliveryFinder
 }
 
 // NewDeliveryQry creates a new DeliveryQry.
-func NewDeliveryQry(publisher Publisher) *DeliveryQry {
-	return &DeliveryQry{publisher: publisher}
+func NewDeliveryQry(r DeliveryFinder) *DeliveryQry {
+	return &DeliveryQry{repo: r}
 }
 
-// FindDriverPosition retrieves a driver's position from either the Redis cache or the database.
-func (p *DeliveryQry) FindDriverPosition(driverID uint64) (domain.DriverPosition, error) {
-
-	return domain.DriverPosition{}, nil
+// FindDriverPosition finds a driver position.
+func (q *DeliveryQry) FindDriverPosition(driverID uint64) (domain.DriverPosition, error) {
+	return q.repo.FindDriverPosition(driverID)
 }
 
 // HistoryDriverPosition finds a driver position history.
-func (p *DeliveryQry) HistoryDriverPosition(driverID uint64) ([]domain.DriverPosition, error) {
-	return nil, nil
+func (q *DeliveryQry) HistoryDriverPosition(driverID uint64) ([]domain.DriverPosition, error) {
+	return q.repo.HistoryDriverPosition(driverID)
 }
 
 // GetDriversNearby finds drivers nearby.
-func (p *DeliveryQry) GetDriversNearby(latitude, longitude float64, radius int) ([]domain.DriverPosition, error) {
-	return nil, nil
+func (q *DeliveryQry) GetDriversNearby(latitude, longitude float64, radius int) ([]domain.DriverPosition, error) {
+	return q.repo.GetDriversNearby(latitude, longitude, radius)
 }

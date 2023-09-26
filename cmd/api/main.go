@@ -2,7 +2,6 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
@@ -11,9 +10,9 @@ import (
 	"github.com/julioc98/delivery/internal/app"
 	"github.com/julioc98/delivery/internal/infra/api"
 	"github.com/julioc98/delivery/internal/infra/db"
+	"github.com/julioc98/delivery/pkg/cache"
+	"github.com/julioc98/delivery/pkg/database"
 	"github.com/julioc98/delivery/pkg/event"
-	"github.com/nats-io/nats.go"
-	"github.com/redis/go-redis/v9"
 
 	_ "github.com/lib/pq"
 )
@@ -26,17 +25,17 @@ func main() {
 	r.Use(middleware.AllowContentType("application/json", "text/xml"))
 
 	// Create connections.
-	conn, err := dbConn()
+	conn, err := database.Conn()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	redisClient, err := redisConn()
+	redisClient, err := cache.RedisConn()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	natsClient, err := natsConn()
+	natsClient, err := event.NatsConn()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,34 +67,4 @@ func main() {
 
 		log.Fatal(err)
 	}
-}
-
-func dbConn() (*sql.DB, error) {
-	conn, err := sql.Open("postgres", "user=postgres password=postgres dbname=postgres sslmode=disable")
-	if err != nil {
-		return nil, err
-	}
-
-	return conn, nil
-}
-
-func redisConn() (*redis.Client, error) {
-	opt, err := redis.ParseURL("redis://@localhost:6379/0")
-	if err != nil {
-		return nil, err
-	}
-
-	client := redis.NewClient(opt)
-
-	return client, nil
-}
-
-func natsConn() (*nats.Conn, error) {
-	// Connect to a server
-	nc, err := nats.Connect(nats.DefaultURL)
-	if err != nil {
-		return nil, err
-	}
-
-	return nc, nil
 }

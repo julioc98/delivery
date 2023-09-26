@@ -1,4 +1,3 @@
-// Package mdg represents the message driven gateway.
 package app
 
 import (

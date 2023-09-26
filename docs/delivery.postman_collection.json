@@ -1,0 +1,147 @@
+{
+	"info": {
+		"_postman_id": "51b34fcd-5b2a-4127-b641-c305e70a2124",
+		"name": "delivery",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1762769"
+	},
+	"item": [
+		{
+			"name": "Save a new driver position",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"latitude\": 154.9988 ,\n    \"longitude\": 89.1622\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3001/drivers/1/locations",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"drivers",
+						"1",
+						"locations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a current driver position",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:3001/drivers/1/locations/current",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"drivers",
+						"1",
+						"locations",
+						"current"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get driver history positions",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:3001/drivers/1/locations",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"drivers",
+						"1",
+						"locations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get driver nearby",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:3001/drivers/locations/nearby?latitude=154.9987&longitude=89.1621&radius=100",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"drivers",
+						"locations",
+						"nearby"
+					],
+					"query": [
+						{
+							"key": "latitude",
+							"value": "154.9987"
+						},
+						{
+							"key": "longitude",
+							"value": "89.1621"
+						},
+						{
+							"key": "radius",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
